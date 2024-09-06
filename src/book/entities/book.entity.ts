@@ -7,4 +7,7 @@ export class BookEntity implements Book{
     name: string;
     @ApiProperty()
     publishedAt: string;
+
+    @ApiProperty()
+    authorNo:number;
 }

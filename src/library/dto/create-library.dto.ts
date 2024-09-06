@@ -22,6 +22,6 @@ export class CreateAuthorDto {
     countryId: number;
 
     @ApiProperty()
-    bookIds: number[];
+    books?:number[];
 }
 

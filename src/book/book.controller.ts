@@ -14,11 +14,7 @@ export class BookController {
   @Post()
   @ApiCreatedResponse({type:BookEntity})
   create(@Body() createBookDto: CreateBookDto) {
-    const {name,publishedAt}=createBookDto;
-    return this.bookService.create({
-      name,
-      publishedAt,
-    });
+    return this.bookService.create(createBookDto);
   }
 
   @Get()

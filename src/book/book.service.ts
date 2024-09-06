@@ -2,22 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { connect } from 'http2';
 @Injectable()
 export class BookService {
   constructor(private prisma:PrismaService){}
+
+  //creating the book 
   create(createBookDto: CreateBookDto) {
-    const {authorNo=[],...rest}=createBookDto;
+    const {authorNo,...rest}=createBookDto;
     return this.prisma.book.create({
       data:{
         ...rest,
-        authors:{
-          create:authorNo.map((authorid)=>({
-            author:{
-              connect:{id:  authorid}
-            }
-          })
-          )
-        }
+        authors:{create:{
+          author:{connect:{id:authorNo}}
+        }}
       }
     })
   }

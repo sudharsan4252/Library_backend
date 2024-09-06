@@ -14,58 +14,47 @@ export class LibraryService {
   constructor(private prisma:PrismaService){}
 
 // for author creation
-createAuthor(createAuthorDto: CreateAuthorDto) {
-  const { bookIds, ...rest } = createAuthorDto;
-
-  return this.prisma.author.create({
-    data: {
-      ...rest,
-      books: {
-        create: bookIds.map((bookId) => ({
-          book: {
-            connect: { id: bookId }
+// working good till all fine
+  findAll(){
+    return this.prisma.author.findMany({include:{
+      books:{
+        select:{
+          book:{
+            select:{
+              name:true,
+              publishedAt:true
+            }
           }
-        }))
+        }
       }
-    },include:{
+    }})
+  }
+//creating the author
+  createAuthor(createBookDto:CreateAuthorDto){
+    const {books,...rest}=createBookDto;
+    return this.prisma.author.create({
+      data:{...rest,
+        books: {
+        create: books.map((bookId) => ({
+          book: {
+            connect: { id: bookId },
+          },
+        })),
+      },
+    },
+    include:{
       books:{
         include:{
-          author:true
+          book:{
+            select:{
+              name:true,
+              publishedAt:true
+            }
+          }
         }
       }
     }
-  });
-}
-  //for getting all the author
-  // async findAll():Promise<Author[]> {
-  //   return this.prisma.author.findMany({
-  //     where:{
-  //       author:true
-  //     },
-  //     include:{
-  //       posts:true
-  //     }
-  //   })
-  // }
-
-  //dummy text trying
-  async findAll(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.AuthorWhereUniqueInput;
-    where?: Prisma.AuthorWhereInput;
-    orderBy?: Prisma.AuthorOrderByWithRelationInput;
-    include?:Prisma.AuthorInclude;
-  }): Promise<Author[]> {
-    const { skip, take, cursor, where, orderBy,include } = params;
-    return this.prisma.author.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-      include,
-    });
+    })
   }
 
 
@@ -84,29 +73,35 @@ createAuthor(createAuthorDto: CreateAuthorDto) {
     })
   }
   // for updating a specific author
+
   updateAuthor(id: number, updateLibraryDto: UpdateAuthorDto) {
-    return this.prisma.author.update({where:{id},data:updateLibraryDto});
+    const {books,...rest}=updateLibraryDto;
+    return this.prisma.author.update({where:{id},data:{...rest,
+      books:books && books.length > 0 ?{
+    create:books.map((bookid)=>({
+          book:{
+            connect:{id:bookid}
+          }
+        }))
+      }:undefined
+    },
+    include:{
+      books:{
+        include:{
+          book:{
+            select:{
+              name:true,
+              publishedAt:true
+            }
+          }
+        }
+      }
+    }
+  });
   }
+
   // for deleting a specific author
   deleteAuthor(id:number){
     return this.prisma.author.delete({where:{id}})
-  }
-  
-  
-  async users(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.AuthorWhereUniqueInput;
-    where?: Prisma.AuthorWhereInput;
-    orderBy?: Prisma.AuthorOrderByWithRelationInput;
-  }): Promise<Author[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.author.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
   }
 }

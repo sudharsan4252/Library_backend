@@ -25,8 +25,14 @@ export class CountryService {
           include:{
             city:true,
           }
+        },users:{
+          select:{
+            name:true,
+            email:true
+          }
         }
-      }
+      },
+      
     })
   }
 

@@ -15,15 +15,8 @@ export class AuthorController {
    //for getting all the author
   @Get()
   @ApiOkResponse({type:LibraryEntity})
-  findAll():Promise<Author[]> {
-    return this.libraryService.findAll({
-      where:{
-        id:1,
-      },
-      include:{
-        books:true,
-      }
-    });
+  findAll() {
+    return this.libraryService.findAll();
   }
 // for finding the specific author
   @Get(':id')
@@ -31,7 +24,7 @@ export class AuthorController {
   authorOne(@Param('id') id: string) {
     return this.libraryService.authorOne(+id);
   }
-  // for creating an author
+  //for creating an author
   @Post()
   @ApiCreatedResponse({type:LibraryEntity})
   createAuthor(@Body()createLibraryDto:CreateAuthorDto){
@@ -39,11 +32,14 @@ export class AuthorController {
   }
 
   // updating an author
-  // @Patch(':id')
-  // @ApiOkResponse({type:LibraryEntity})
-  // updateAuthor(@Param('id') id: String, @Body() updateLibraryDto: UpdateAuthorDto) {
-  // return this.libraryService.updateAuthor(+id, updateLibraryDto);
-  // }
+@Patch(':id')
+@ApiOkResponse({type:LibraryEntity})
+updateAuthor(@Param('id') id: String, @Body() updateLibraryDto: UpdateAuthorDto) {
+  return this.libraryService.updateAuthor(+id, updateLibraryDto);
+  }
+
+
+
   // deleting an author
   @Delete(':id')
   @ApiOkResponse({type:LibraryEntity})
