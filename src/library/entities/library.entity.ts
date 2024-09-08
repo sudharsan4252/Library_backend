@@ -24,4 +24,11 @@ export class LibraryEntity implements Author {
 
     @ApiProperty()
     books: number;
+
+    @ApiProperty()
+    createdAt: Date;
+    @ApiProperty()
+    updatedAt: Date;
+
+    
 }

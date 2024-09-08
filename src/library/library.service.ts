@@ -2,12 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-library.dto';
 import { UpdateAuthorDto } from './dto/update-library.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Author, Prisma } from '@prisma/client';
-interface User{
-  id:any;
-  name:any;
-}
-
 @Injectable()
 export class LibraryService {
 
@@ -59,10 +53,10 @@ export class LibraryService {
 
 
 
-  //for  getting specific author
+  // for  getting specific author
   authorOne(id:number){
     return this.prisma.author.findUnique({
-      where:{id},
+      where:{id:id},
       include:{
         books:{
           include:{
@@ -104,4 +98,66 @@ export class LibraryService {
   deleteAuthor(id:number){
     return this.prisma.author.delete({where:{id}})
   }
+
+  //by finding the author with the specific fields
+
+  async searchByText(searchTerm: string) {
+  return this.prisma.author.findMany({
+    where: {
+      name: {
+        contains: searchTerm, // Partial match search using Prisma's `contains`
+        mode: 'insensitive', // Case-insensitive search
+      },
+    },
+  });
+}
+
+// async finduserByname(name: string,startDate?: string, endDate?: string) {
+// if(name){
+//    return this.prisma.author.findMany({
+//     where: {
+//       OR: [
+//         {
+//           name: {
+//             contains: name, // Search for partial match in author name
+//             mode: 'insensitive',
+//           },
+//         },
+//         {
+//           books: {
+//             some: {
+//               book: {
+//                 name: {
+//                   contains: name, 
+//                   mode: 'insensitive',
+//                 },
+//                 publishedAt:{
+//                   gte:startDate?new Date(startDate):undefined,
+//                   lte:endDate?new Date(endDate):undefined
+//                 }
+//               },
+//             },
+//           },
+//         },
+//       ],
+//     },
+//     include: {
+//       books: {
+//         select: {
+//           book: {
+//             select: {
+//               name: true,
+//               publishedAt: true,
+//             },
+//           },
+//         },
+//       },
+//     },
+//   });
+// } return this.prisma.author.findMany()
+ 
+// }
+
+
+
 }

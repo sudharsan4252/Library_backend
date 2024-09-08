@@ -10,4 +10,9 @@ export class CityEntity implements City {
 
     @ApiProperty()
     stateId: number;
+
+    @ApiProperty()
+    createdAt: Date;
+    @ApiProperty()
+    updatedAt: Date;
 }

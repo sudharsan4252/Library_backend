@@ -9,4 +9,9 @@ export class StateEntity implements State {
 
     @ApiProperty()
     countryId: number;
+
+    @ApiProperty()
+    createdAt: Date;
+    @ApiProperty()
+    updatedAt: Date;
 }

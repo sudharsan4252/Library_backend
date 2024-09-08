@@ -6,5 +6,10 @@ export class CountryEntity implements Country{
 
     @ApiProperty()
     name: string;
+
+    @ApiProperty()
+    createdAt: Date;
+    @ApiProperty()
+    updatedAt: Date;
 }
 

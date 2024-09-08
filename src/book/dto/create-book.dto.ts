@@ -4,7 +4,7 @@ export class CreateBookDto {
     name:string;
 
     @ApiProperty()
-    publishedAt: string;
+    publishedAt: Date;
 
     @ApiProperty()
     authorNo:number;

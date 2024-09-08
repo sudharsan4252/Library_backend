@@ -1,154 +1,91 @@
-// import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { faker } from '@faker-js/faker';
 
-// // initialize Prisma Client
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
-// type users={
-//   name:string;
-  
-// }
+async function main() {
+  // Seed Countries
+  const countries = await Promise.all(
+    Array.from({ length: 5 }).map(async () => {
+      return prisma.country.create({
+        data: {
+          name: faker.address.country(),
+        },
+      });
+    })
+  );
 
-// async function main() {
-//   //creating country with state and cities
-//   const india = await prisma.country.create({
-//     data:{
-//       name:"india",
-//       state:{
-//         create:[
-//           {
-//             name:"tamilnadu",
-//             city:{
-//               create:[
-//                 {
-//                 name:"chennai"
-//               },
-//               {
-//                 name:"kanchepuram"
-//               }
-//               ]
-//             }
-//           },
-//           {
-//             name:"Kerala",
-//             city:{
-//               create:[
-//                 {
-//                   name:"kochi",
-//                 },
-//                 {
-//                   name:"alappi"
-//                 }
-//               ]
-//             }
-//           }
-//         ]
-//       }
-//     }
-//   });
-//     const usa = await prisma.country.create({
-//     data:{
-//       name:"united states",
-//       state:{
-//         create:[
-//           {
-//             name:"california",
-//             city:{
-//               create:[
-//                 {
-//                 name:"Los Angeles"
-//               },
-//               {
-//                 name:"San Francisco"
-//               }
-//               ]
-//             }
-//           },
-//           {
-//             name:"New york",
-//             city:{
-//               create:[
-//                 {
-//                   name:"New york city",
-//                 },
-//                 {
-//                   name:"Albany"
-//                 }
-//               ]
-//             }
-//           }
-//         ]
-//       }
-//     }
-//   });
+  // Seed States
+  const states = await Promise.all(
+    countries.map(async (country) => {
+      return prisma.state.create({
+        data: {
+          name: faker.address.state(),
+          countryId: country.id,
+        },
+      });
+    })
+  );
 
-// // creating authors
-// const author1= await prisma.author.create({
-//   data: {
-//       name: 'vrishab vinayak',
-//       email: 'vrishab4252@gmail.com',
-//       Dob: '2004-02-25',
-//       country: { connect: { id: usa.id } },
-//       state: { connect: { id: usa.state[0]}},
-//       city: { connect: { id: usa.state[0].city[0].id } }
-//     }
-// });
+  // Seed Cities
+  const cities = await Promise.all(
+    states.map(async (state) => {
+      return prisma.city.create({
+        data: {
+          name: faker.address.city(),
+          stateId: state.id,
+        },
+      });
+    })
+  );
 
-//     const author2= await prisma.author.create({
-//   data: {
-//       name: 'sanjay vinayak',
-//       email: 'sanjay4252@gmail.com',
-//       Dob: '2004-02-25',
-//       country: { connect: { id: usa.id } },
-//       state: { connect: { id:usa.} },
-//       city: { connect: { id: usa.state[0].city[0].id } }
-//     }
-// });
-//     const author3 = await prisma.author.create({
-//       data: {
-//       name: 'sudharsan',
-//       email: 'sudharsan4252@gmail.com',
-//       Dob: '2004-02-25',
-//       country: { connect: { id: usa.id } },
-//       state: { connect: { id: india.state[0]} },
-//       city: { connect: { id: usa.state[0].city[0].id } }
-//     }
-//     });
-//     //books
-//     const book1 = await prisma.book.create({
-//     data: {
-//       name: 'sun',
-//       publishedAt: '2021-07-15',
-//       authors: {
-//         create: { authorId: author2.id }
-//       }
-//     }
-//   });
-//   const book2 = await prisma.book.create({
-//     data: {
-//       name: 'moon',
-//       publishedAt: '2021-07-15',
-//       authors: {
-//         create: { authorId: author1.id }
-//       }
-//     }
-//   });
-//   const book3 = await prisma.book.create({
-//     data: {
-//       name: 'sea',
-//       publishedAt: '2021-04-15',
-//       authors: {
-//         create: { authorId: author3.id }
-//       }
-//     }
-//   });
-// }
-// // execute the main function
-// main()
-//   .catch((e) => {
-//     console.error(e);
-//     process.exit(1);
-//   })
-//   .finally(async () => {
-//     // close Prisma Client at the end
-//     await prisma.$disconnect();
-//   });
+  // Seed Authors
+  const authors = await Promise.all(
+    Array.from({ length: 10 }).map(async () => {
+      const city = faker.helpers.arrayElement(cities);
+      const state = await prisma.state.findUnique({ where: { id: city.stateId } });
+      const country = await prisma.country.findUnique({ where: { id: state?.countryId } });
+
+      return prisma.author.create({
+        data: {
+          name: faker.name.fullName(),
+          email: faker.internet.email(),
+          Dob: faker.date.past({years:50}).toISOString().split('T')[0],
+          cityId: city.id,
+          stateId: state!.id,
+          countryId: country!.id,
+        },
+      });
+    })
+  );
+
+  // Seed Books
+  const books = await Promise.all(
+    Array.from({ length: 20 }).map(async () => {
+      const author = faker.helpers.arrayElement(authors);
+
+      return prisma.book.create({
+        data: {
+          name: faker.lorem.words(3),
+          publishedAt: faker.date.past({years:10}),
+          authors: {
+            create: {
+              authorId: author.id,
+            },
+          },
+        },
+      });
+    })
+  );
+
+  console.log('Seeding complete!');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CountryService } from './country.service';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
-import { ApiTags,ApiOkResponse,ApiCreatedResponse, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiTags,ApiOkResponse,ApiCreatedResponse, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
 import { CountryEntity } from './entities/country.entity';
+import { query } from 'express';
+import { CountrySearchParamDto } from './dto/search-country.dto';
 @ApiTags('Country')
 @Controller('country')
 export class CountryController {
@@ -16,11 +18,14 @@ export class CountryController {
   }
 
   @Get()
-  @ApiOkResponse({type:CountryEntity})
-  findAll() {
-    return this.countryService.findAll();
-  }
+@ApiQuery({name:'type',required:false,type:String})
+locationData(@Query() query:CountrySearchParamDto){
+  return this.countryService.locationData(query);
+}
 
+
+
+ //get country based on country id 
   @Get(':id')
   @ApiOkResponse({type:CountryEntity})
   findOne(@Param('id') id: string) {

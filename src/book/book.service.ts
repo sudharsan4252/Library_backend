@@ -43,5 +43,3 @@ export class BookService {
     }})
   }
 }
-
-// service page is more than enough for for writing the logic

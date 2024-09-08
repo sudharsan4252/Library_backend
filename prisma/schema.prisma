@@ -14,27 +14,36 @@ datasource db {
 }
 
 model City {
-  id      Int      @id @default(autoincrement())
-  name    String
-  users   Author[]
-  state   State    @relation(fields: [stateId], references: [id])
-  stateId Int
+  id        Int       @id @default(autoincrement())
+  name      String
+  users     Author[]
+  state     State     @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  stateId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model State {
   id        Int      @id @default(autoincrement())
   name      String
-  users    Author[]
+  users     Author[]
   city      City[]
-  country   Country?  @relation(fields: [countryId], references: [id])
+  // connected only throught the country and countryId represents the id of the state s country
+  country   Country? @relation(fields: [countryId], references: [id], onDelete: Cascade)
   countryId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+// while deleting the country the state will be also be deleted
+
 model Country {
-  id    Int      @id @default(autoincrement())
-  name  String
-  users Author[]
-  state State[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  users     Author[]
+  state     State[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Author {
@@ -49,19 +58,26 @@ model Author {
   country   Country     @relation(fields: [countryId], references: [id])
   countryId Int
   books     Book_data[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Book {
   id          Int         @id @default(autoincrement())
   name        String
-  publishedAt String
+  publishedAt DateTime
   authors     Book_data[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Book_data {
-  book     Book   @relation(fields: [bookId], references: [id])
-  bookId   Int
-  author   Author @relation(fields: [authorId], references: [id])
-  authorId Int
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  author    Author   @relation(fields: [authorId], references: [id])
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@id([bookId, authorId])
 }
